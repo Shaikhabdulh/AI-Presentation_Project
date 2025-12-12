@@ -263,3 +263,5 @@ If you encounter issues:
 - [ ] Can register and contact vendors
 
 **Once all items are checked, your system is ready! 🎉**
+code C:\Users\Administrator\.npmrc
+workspaces=true
