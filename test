@@ -1,0 +1,265 @@
+# 🚀 Quick Startup Guide
+
+This guide will help you get your Inventory Management System up and running quickly.
+
+## 📋 Prerequisites Check
+
+Before starting, make sure you have:
+- ✅ Node.js 18+ installed
+- ✅ Docker Desktop running
+- ✅ Git installed (for cloning)
+- ✅ At least 4GB RAM available
+
+## 🎯 Quick Start (5 minutes)
+
+### Option 1: Automated Setup (Windows)
+
+1. **Double-click the setup script**:
+   ```
+   quick-setup.bat
+   ```
+
+2. **Wait for completion** - The script will:
+   - Install dependencies
+   - Start MySQL and Redis
+   - Seed the database
+   - Start all services
+   - Show you the access URLs
+
+3. **Access the application**:
+   - Frontend: http://localhost:3000
+   - Default login: admin@inventory.com / password123
+
+### Option 2: Manual Setup (All Platforms)
+
+#### Step 1: Navigate to Project Directory
+```bash
+cd C:\Users\Administrator\Downloads\OKComputer_Scalable Inventory Microservices Architecture (1)\inventory-management-system
+```
+
+#### Step 2: Install Dependencies
+```bash
+# Install all dependencies
+npm run setup
+```
+
+#### Step 3: Start Database Services
+```bash
+# Start MySQL and Redis
+docker-compose -f docker-compose-simple.yml up -d mysql redis
+
+# Wait 30 seconds for services to start
+sleep 30
+```
+
+#### Step 4: Seed Database
+```bash
+# Navigate to database directory
+cd database
+
+# Install database dependencies
+npm install
+
+# Seed the database
+node seed.js
+
+# Go back to root directory
+cd ..
+```
+
+#### Step 5: Start All Services
+```bash
+# Start all services
+docker-compose -f docker-compose-simple.yml up -d
+
+# Or start individually with npm:
+# Terminal 1: npm run dev:frontend
+# Terminal 2: npm run dev:backend
+```
+
+#### Step 6: Verify Installation
+```bash
+# Check if all services are running
+docker-compose -f docker-compose-simple.yml ps
+
+# View logs
+docker-compose -f docker-compose-simple.yml logs -f
+```
+
+## 🌐 Access Points
+
+Once everything is running, you can access:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Frontend** | http://localhost:3000 | Main application interface |
+| **Auth Service** | http://localhost:3001 | Authentication API |
+| **Inventory Service** | http://localhost:3002 | Inventory management API |
+| **Notification Service** | http://localhost:3003 | Real-time notifications API |
+| **Vendor Service** | http://localhost:3004 | Vendor management API |
+
+## 🔐 Default Login Credentials
+
+- **Admin Account**: 
+  - Email: `admin@inventory.com`
+  - Password: `password123`
+
+- **Create New Account**: Use the registration form on the login page
+
+## 📊 What's Available
+
+### Features You Can Use Immediately:
+
+1. **Dashboard**: View inventory summary, recent activity, and charts
+2. **Inventory Management**: 
+   - Add new items
+   - Update quantities
+   - Set minimum thresholds
+   - View low stock alerts
+3. **Vendor Management**:
+   - Register vendors
+   - Contact vendors about items
+   - Track vendor relationships
+4. **Real-time Notifications**:
+   - Low stock alerts
+   - System notifications
+   - Vendor contact history
+
+### Sample Data Included:
+- 8+ inventory items across different categories
+- 5+ registered vendors
+- 10+ notifications and alerts
+- Pre-configured admin user
+
+## 🔧 Common Commands
+
+### Managing Services
+```bash
+# Start all services
+docker-compose -f docker-compose-simple.yml up -d
+
+# Stop all services
+docker-compose -f docker-compose-simple.yml down
+
+# Restart a specific service
+docker-compose -f docker-compose-simple.yml restart frontend
+
+# View logs
+docker-compose -f docker-compose-simple.yml logs -f [service-name]
+
+# Check service status
+docker-compose -f docker-compose-simple.yml ps
+```
+
+### Development Commands
+```bash
+# Start frontend in development mode
+cd frontend && npm run dev
+
+# Start backend services individually
+cd backend/auth-service && npm run dev
+cd backend/inventory-service && npm run dev
+cd backend/notification-service && npm run dev
+cd backend/vendor-service && npm run dev
+```
+
+### Database Management
+```bash
+# Reset database (if needed)
+cd database
+node seed.js
+
+# Access MySQL console
+docker exec -it inventory-mysql mysql -u inventory_user -p
+# Password: secure_password
+```
+
+## 🐛 Troubleshooting
+
+### Problem: "Port already in use"
+```bash
+# Check what's using the port
+netstat -ano | findstr :3000
+
+# Kill the process
+taskkill /PID <PID> /F
+
+# Or use different ports in .env files
+```
+
+### Problem: "Cannot connect to MySQL"
+```bash
+# Check if MySQL container is running
+docker ps | grep mysql
+
+# Check MySQL logs
+docker logs inventory-mysql
+
+# Restart MySQL
+docker-compose -f docker-compose-simple.yml restart mysql
+```
+
+### Problem: "Frontend not building"
+```bash
+# Clear cache and reinstall
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+### Problem: "Services not starting"
+```bash
+# Check Docker resources
+docker system df
+
+# Clean up if needed
+docker system prune -f
+
+# Restart Docker Desktop
+# Then try starting again
+```
+
+## 📈 Next Steps
+
+Once your system is running, you can:
+
+1. **Explore the Dashboard**: http://localhost:3000
+2. **Add Inventory Items**: Use the inventory management page
+3. **Register Vendors**: Add your supplier information
+4. **Test Notifications**: Create low stock items to see alerts in action
+5. **Customize**: Modify the code for your specific needs
+
+## 🎓 Learning Resources
+
+- **Architecture**: Read `ARCHITECTURE.md` for technical details
+- **Setup Guide**: See `SETUP.md` for detailed installation
+- **API Documentation**: Check the README files in each service
+- **Database Schema**: Review `database/init.sql`
+
+## 💡 Tips
+
+1. **Development**: Use `npm run dev` for hot reload during development
+2. **Production**: Use Docker Compose for consistent deployment
+3. **Testing**: Use Postman to test API endpoints
+4. **Monitoring**: Check logs regularly for issues
+5. **Backup**: Regularly backup your MySQL data
+
+## 🆘 Need Help?
+
+If you encounter issues:
+1. Check the logs: `docker-compose -f docker-compose-simple.yml logs -f`
+2. Review the troubleshooting section above
+3. Check the complete documentation in `docs/` folder
+
+## ✅ Success Checklist
+
+- [ ] All Docker containers are running (`docker ps`)
+- [ ] Frontend loads at http://localhost:3000
+- [ ] Can login with admin credentials
+- [ ] Dashboard shows data and charts
+- [ ] Can add/edit inventory items
+- [ ] Notifications appear for low stock items
+- [ ] Can register and contact vendors
+
+**Once all items are checked, your system is ready! 🎉**
