@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "inventory_user",
+    "password": "secure_password",
+    "database": "inventory_db",
+    "host": "localhost",
+    "dialect": "mysql"
+  }
+}

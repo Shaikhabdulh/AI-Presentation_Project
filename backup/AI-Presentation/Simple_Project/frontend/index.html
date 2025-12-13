@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Inventory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Inventory Management</h1>
+
+        <!-- Add Product Form -->
+        <div class="form-container">
+            <h2>Add New Product</h2>
+            <form id="add-product-form">
+                <input type="text" id="name" placeholder="Product Name" required>
+                <input type="number" id="quantity" placeholder="Quantity" required>
+                <input type="text" id="description" placeholder="Description (Optional)">
+                <input type="number" step="0.01" id="price" placeholder="Price (Optional)">
+                <button type="submit">Add Product</button>
+            </form>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="search" id="search-input" placeholder="Search for products...">
+        </div>
+
+        <!-- Product List -->
+        <div id="product-list">
+            <p>Loading products...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

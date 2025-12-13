@@ -1,0 +1,155 @@
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: inventory-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-inventory_db}
+      MYSQL_USER: ${MYSQL_USER:-inventory_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secure_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - inventory-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: inventory-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://api-gateway:3000/api
+      VITE_SOCKET_URL: http://localhost:3001
+    depends_on:
+      - api-gateway
+    networks:
+      - inventory-network
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
+    container_name: inventory-auth-service
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_USER: ${MYSQL_USER:-inventory_user}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-secure_password}
+      DATABASE_NAME: ${MYSQL_DATABASE:-inventory_db}
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      NODE_ENV: development
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventory-network
+
+  # Inventory Service
+  inventory-service:
+    build:
+      context: ./backend/inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    restart: unless-stopped
+    ports:
+      - "3101:3101"
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_USER: ${MYSQL_USER:-inventory_user}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-secure_password}
+      DATABASE_NAME: ${MYSQL_DATABASE:-inventory_db}
+      NODE_ENV: development
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventory-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./backend/notification-service
+      dockerfile: Dockerfile
+    container_name: inventory-notification-service
+    restart: unless-stopped
+    ports:
+      - "3102:3102"
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_USER: ${MYSQL_USER:-inventory_user}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-secure_password}
+      DATABASE_NAME: ${MYSQL_DATABASE:-inventory_db}
+      NODE_ENV: development
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventory-network
+
+  # Vendor Service
+  vendor-service:
+    build:
+      context: ./backend/vendor-service
+      dockerfile: Dockerfile
+    container_name: inventory-vendor-service
+    restart: unless-stopped
+    ports:
+      - "3103:3103"
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_USER: ${MYSQL_USER:-inventory_user}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-secure_password}
+      DATABASE_NAME: ${MYSQL_DATABASE:-inventory_db}
+      NODE_ENV: development
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventory-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: inventory-api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:3100
+      INVENTORY_SERVICE_URL: http://inventory-service:3101
+      VENDOR_SERVICE_URL: http://vendor-service:3103
+      NOTIFICATION_SERVICE_URL: http://notification-service:3102
+      NODE_ENV: development
+    depends_on:
+      - auth-service
+      - inventory-service
+      - vendor-service
+      - notification-service
+    networks:
+      - inventory-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  inventory-network:
+    driver: bridge
